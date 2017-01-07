@@ -63,7 +63,7 @@ public class App
                     "'rooms" + atomicInteger.get() + "')");
             jdbcTemplate.update("INSERT INTO \"USER\"" +
                     " VALUES (" + atomicInteger.get() + "," +
-                    "'usersnumber" +atomicInteger.get() + "',"+atomicInteger.getAndDecrement()+")");
+                    "'usersnumber" +atomicInteger.get() + "',"+atomicInteger.getAndIncrement()+")");
     }
 
     @Benchmark
@@ -75,7 +75,7 @@ public class App
         User user = new User();
         user.setId(atomicInteger.get());
         user.setName("usersnumber "+ atomicInteger.get());
-        user.setRoom_number(atomicInteger.getAndDecrement());
+        user.setRoom_number(atomicInteger.getAndIncrement());
 
         Session session = sessionPostgres.openSession();
         Transaction tx = session.beginTransaction();
