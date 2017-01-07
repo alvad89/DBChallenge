@@ -1,11 +1,25 @@
 package info.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
+
 /**
  * Created by alvad89 on 07.01.17.
  */
-public class User {
+@Entity
+@Table(name = "\"user\"")
+public class User implements Serializable {
+
+    @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", unique = true, nullable = false)
     int id;
+
+    @Column()
     String name;
+
+    @Column(name = "room_number", unique = true, nullable = false)
+//    @OneToOne(targetEntity = Room.class)
     int room_number;
 
     public int getId() {

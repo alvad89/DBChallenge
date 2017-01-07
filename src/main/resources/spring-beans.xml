@@ -22,6 +22,24 @@
             <constructor-arg name="dataSource" ref="h2DataSource"/>
             <constructor-arg name="lazyInit" value="false"/>
         </bean>
+
+        <bean id="sessionH2Factory"
+              class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+            <property name="dataSource" ref="h2DataSource" />
+            <property name="annotatedClasses">
+                <list>
+                    <value>info.entity.Room</value>
+                    <value>info.entity.User</value>
+                </list>
+            </property>
+            <property name="hibernateProperties">
+                <props>
+                    <prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+                    <prop key="hibernate.current_session_context_class">thread</prop>
+                    <prop key="hibernate.show_sql">false</prop>
+                </props>
+            </property>
+        </bean>
     </beans>
 
     <beans profile="postgres">
@@ -36,6 +54,26 @@
             <constructor-arg name="dataSource" ref="postgresDataSource"/>
             <constructor-arg name="lazyInit" value="false"/>
         </bean>
+
+
+        <bean id="sessionPostgresqlFactory"
+              class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+            <property name="dataSource" ref="postgresDataSource" />
+            <property name="annotatedClasses">
+                <list>
+                    <value>info.entity.Room</value>
+                    <value>info.entity.User</value>
+                </list>
+            </property>
+            <property name="hibernateProperties">
+                <props>
+                    <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQL95Dialect</prop>
+                    <prop key="hibernate.current_session_context_class">thread</prop>
+                    <prop key="hibernate.show_sql">false</prop>
+                </props>
+            </property>
+        </bean>
+
     </beans>
 
 

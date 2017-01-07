@@ -1,10 +1,21 @@
 package info.entity;
 
+import javax.persistence.*;
+import java.io.Serializable;
+
 /**
  * Created by alvad89 on 07.01.17.
  */
-public class Room {
+@Entity
+@Table(name = "room")
+public class Room implements Serializable {
+
+    @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", unique = true, nullable = false)
     int id;
+
+    @Column(name = "room_name")
     String roomName;
 
     public int getId() {
