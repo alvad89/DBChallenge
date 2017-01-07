@@ -1,4 +1,4 @@
-package info.grishaev;
+package info;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
