@@ -12,9 +12,12 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,15 +34,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Fork(1)
 public class App 
 {
-    JdbcTemplate jdbcTemplate;
-    AtomicInteger atomicInteger = new AtomicInteger();
-    SessionFactory sessionPostgres;
+    static JdbcTemplate jdbcTemplate;
+    static AtomicInteger atomicInteger = new AtomicInteger();
+    static SessionFactory sessionPostgres;
+    private static AtomicInteger atomicInteger2 = new AtomicInteger();
 
 
     @Setup
-    public void setUp() {
+    public static void setUp() {
         System.out.println("set up");
-        System.setProperty("spring.profiles.active", "postgres");
+        System.setProperty("spring.profiles.active", "h2");
         ApplicationContext context = new ClassPathXmlApplicationContext("spring-beans.xml");
         jdbcTemplate = context.getBean(JdbcTemplate.class);
         LocalSessionFactoryBean localSessionFactoryBean  = context.getBean(LocalSessionFactoryBean.class);
@@ -53,9 +57,17 @@ public class App
                 .forks(1)
                 .build();
         new Runner(options).run();
+
+        //jdbctemplate
+        //3373 mc для batch для h2 для 100000 записей
+        //4070 mc для batch postgre для 100000 записей
+//        setUp();
+//        long l = System.currentTimeMillis();
+//        batch();
+//        System.out.println(System.currentTimeMillis() - l);
     }
 
-    @Benchmark
+//    @Benchmark
     public void generate() {
             jdbcTemplate.update("INSERT INTO room" +
                     " VALUES (" + atomicInteger.get() + "," +
@@ -65,7 +77,7 @@ public class App
                     "'usersnumber" +atomicInteger.get() + "',"+atomicInteger.getAndIncrement()+")");
     }
 
-//    @Benchmark
+    @Benchmark
     public void generateHyber() {
         Room room = new Room();
         room.setId(atomicInteger.get());
@@ -85,5 +97,37 @@ public class App
             session.close();
         }
 
+    }
+
+    public static void batch() {
+        final int batchSize = 10000;
+
+        jdbcTemplate.batchUpdate("insert into room values( ? ,  ?)",
+                new BatchPreparedStatementSetter() {
+
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, atomicInteger.get());
+                        ps.setString(2, "room " + atomicInteger.getAndIncrement());
+                    }
+
+
+                    public int getBatchSize() {
+                        return batchSize;
+                    }
+                });
+
+        jdbcTemplate.batchUpdate("insert into \"user\" values( ? , ? , ?)",
+                new BatchPreparedStatementSetter() {
+
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setInt(1, atomicInteger2.get());
+                        ps.setString(2, "name " + atomicInteger2.get());
+                        ps.setInt(3, atomicInteger2.getAndIncrement());
+                    }
+
+                    public int getBatchSize() {
+                        return batchSize;
+                    }
+                });
     }
 }
