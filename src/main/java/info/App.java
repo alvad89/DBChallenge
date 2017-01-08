@@ -15,7 +15,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
-import java.applet.AppletContext;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -56,17 +55,17 @@ public class App
         new Runner(options).run();
     }
 
-//    @Benchmark
+    @Benchmark
     public void generate() {
-            jdbcTemplate.update("INSERT INTO ROOM" +
+            jdbcTemplate.update("INSERT INTO room" +
                     " VALUES (" + atomicInteger.get() + "," +
                     "'rooms" + atomicInteger.get() + "')");
-            jdbcTemplate.update("INSERT INTO \"USER\"" +
+            jdbcTemplate.update("INSERT INTO \"user\"" +
                     " VALUES (" + atomicInteger.get() + "," +
                     "'usersnumber" +atomicInteger.get() + "',"+atomicInteger.getAndIncrement()+")");
     }
 
-    @Benchmark
+//    @Benchmark
     public void generateHyber() {
         Room room = new Room();
         room.setId(atomicInteger.get());
